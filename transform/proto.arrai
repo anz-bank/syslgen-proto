@@ -1,0 +1,35 @@
+(
+    fields: \.
+        let grpc = //{./grpc};
+        . => cond {
+            //seq.contains("google/protobuf", grpc.type(.@value)): $`
+                ${//seq.sub('/', '.', grpc.type(.@value))} ${.@} = ${.@value('attrs')('rpcId')('s').s};`,
+            _: $`${grpc.type(.@value)} ${.@} = ${.@value('attrs')('rpcId')('s').s};`
+        },
+
+    alias_fields: \field \name
+        let grpc = //{./grpc};
+        {$`${grpc.type(field)} alias${name} = 1;`},
+        
+    imports: \.
+        let grpc = //{./grpc};
+        . => cond {
+            //seq.contains("google/protobuf", grpc.type(.@value)):$`
+            import "${//str.lower(grpc.type(.@value))}.proto";`
+        },
+
+    ep_info: \ep
+        let sysl = //{./sysl};
+        let methodName = //seq.sub("-", "", //str.title(//str.lower(ep('name').s)));
+        let paramName = ep('param').a(0)('type')('typeRef')('ref')('appname')('part').a(0).s;
+        let returnName = $`
+            ${
+                (ep('stmt').a => //seq.sub('ok <: ', '', .@item('ret')?('payload')?.s:'')) 
+                    where . != '' orderby .:::
+            }`;
+        (
+            method: methodName,
+            param: paramName,
+            return: //seq.trim_suffix('\n            ', returnName),
+        ),
+)

@@ -1,0 +1,21 @@
+(
+    type: //fn.fix(\type \t
+        (
+            let sysl = //{./sysl};
+            cond {
+                (sysl.exists(t, 'primitive')): cond t('primitive').s {
+                    'DECIMAL':  'double',
+                    'INT':      'int64',
+                    'FLOAT':    'double',
+                    'STRING':   'string',
+                    'STRING_8': 'string',
+                    'BOOL':     'bool',
+                    'DATE':     'string',
+                    'DATETIME': 'string',
+                },
+                (sysl.exists(t, 'sequence')): 'repeated ' + type(t('sequence')),
+                _: //seq.join('/', t('typeRef')('ref')('path').a >> .s) if (//seq.contains([(s: 'protobuf')], t('typeRef')('ref')('path').a)) else t('typeRef')('ref')('path').a(0).s
+            }
+        )
+    ),
+)

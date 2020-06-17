@@ -1,0 +1,6 @@
+(
+    exists: \json \key
+        json(key)?:false != false,
+    isGrpc: \app
+        ((app("attrs")("patterns")("a")("elt").a where .@item('s').s = "gRPC") != {}),
+)
